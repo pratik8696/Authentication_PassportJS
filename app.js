@@ -58,7 +58,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "/auth/google/secrets",
+    callbackURL: "https://damp-hollows-34398.herokuapp.com/auth/google/secrets",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
 
@@ -75,7 +75,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FB_CLIENT_ID,
     clientSecret:process.env.FB_CLIENT_SECRET,
-    callbackURL: "/auth/facebook/secrets",
+    callbackURL: "https://damp-hollows-34398.herokuapp.com/auth/facebook/secrets",
     proxy:true
   },
   function(accessToken, refreshToken, profile, cb) {
