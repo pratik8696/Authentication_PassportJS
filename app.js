@@ -8,7 +8,6 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-
 const findOrCreate = require('mongoose-findorcreate')
 const app = express();
 
@@ -174,10 +173,11 @@ app.post("/login", function(req, res) {
     }
   });
 
+
 });
 
 
 
-app.listen(3000, function(req, res) {
+app.listen(3000 || process.env.PORT , function(req, res) {
   console.log("Server 3000 is up and running");
 })
