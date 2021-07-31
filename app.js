@@ -106,7 +106,7 @@ passport.use(new FacebookStrategy({
  passport.use(new InstagramStrategy({
      clientID: process.env.INSTAGRAM_CLIENT_ID,
      clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
-     callbackURL: "http://localhost:3000/auth/instagram/secrets"
+     callbackURL: "https://damp-hollows-34398.herokuapp.com/auth/instagram/secrets"
    },
    function(accessToken, refreshToken, profile, done) {
      User.findOrCreate({ instagramId: profile.id }, function (err, user) {
