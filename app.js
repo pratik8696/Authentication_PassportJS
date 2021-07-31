@@ -9,6 +9,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GitHubStrategy = require('passport-github').Strategy;
+const InstagramStrategy = require('passport-instagram').Strategy;
 const findOrCreate = require('mongoose-findorcreate')
 const app = express();
 
@@ -37,7 +38,8 @@ const usersSchema = new mongoose.Schema({
   password: String,
   googleId:String,
   facebookId:String,
-  githubId:String
+  githubId:String,
+  instagramId:String
 });
 
 usersSchema.plugin(passportLocalMongoose);
@@ -102,9 +104,9 @@ passport.use(new FacebookStrategy({
  ));
 
  passport.use(new InstagramStrategy({
-     clientID: INSTAGRAM_CLIENT_ID,
-     clientSecret: INSTAGRAM_CLIENT_SECRET,
-     callbackURL: "http://localhost:3000/auth/instagram/callback"
+     clientID: process.env.INSTAGRAM_CLIENT_ID,
+     clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
+     callbackURL: "http://localhost:3000/auth/instagram/secrets"
    },
    function(accessToken, refreshToken, profile, done) {
      User.findOrCreate({ instagramId: profile.id }, function (err, user) {
@@ -154,7 +156,15 @@ app.get("/auth/google/secrets",
         res.redirect('/secrets');
       });
 
+      app.get('/auth/instagram',
+        passport.authenticate('instagram'));
 
+      app.get('/auth/instagram/secrets',
+        passport.authenticate('instagram', { failureRedirect: '/register' }),
+        function(req, res) {
+          // Successful authentication, redirect home.
+          res.redirect('/secrets');
+        });
 
 
 app.get("/secrets", function(req, res) {
