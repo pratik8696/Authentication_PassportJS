@@ -8,6 +8,7 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const GitHubStrategy = require('passport-github').Strategy;
 const findOrCreate = require('mongoose-findorcreate')
 const app = express();
 
@@ -35,7 +36,8 @@ const usersSchema = new mongoose.Schema({
   email: String,
   password: String,
   googleId:String,
-  facebookId:String
+  facebookId:String,
+  githubId:String
 });
 
 usersSchema.plugin(passportLocalMongoose);
@@ -86,6 +88,31 @@ passport.use(new FacebookStrategy({
    }
  ));
 
+ passport.use(new GitHubStrategy({
+     clientID: process.env.GITHUB_CLIENT_ID,
+     clientSecret: process.env.GITHUB_CLIENT_SECRET,
+     callbackURL: "https://damp-hollows-34398.herokuapp.com/auth/github/secrets"
+   },
+   function(accessToken, refreshToken, profile, cb) {
+     console.log(profile);
+     User.findOrCreate({ githubId: profile.id }, function (err, user) {
+       return cb(err, user);
+     });
+   }
+ ));
+
+ passport.use(new InstagramStrategy({
+     clientID: INSTAGRAM_CLIENT_ID,
+     clientSecret: INSTAGRAM_CLIENT_SECRET,
+     callbackURL: "http://localhost:3000/auth/instagram/callback"
+   },
+   function(accessToken, refreshToken, profile, done) {
+     User.findOrCreate({ instagramId: profile.id }, function (err, user) {
+       return done(err, user);
+     });
+   }
+ ));
+
 app.get("/", function(req, res) {
   res.render('home');
 });
@@ -98,6 +125,10 @@ app.get("/auth/google",
 
 app.get('/auth/facebook',
   passport.authenticate('facebook'));
+
+  app.get('/auth/github',
+    passport.authenticate('github'));
+
 
 app.get("/auth/google/secrets",
   passport.authenticate('google', {
@@ -114,6 +145,16 @@ app.get("/auth/google/secrets",
       // Successful authentication, redirect home.
       res.redirect('/secrets');
     });
+
+
+    app.get('/auth/github/secrets',
+      passport.authenticate('github', { failureRedirect: '/register' }),
+      function(req, res) {
+        // Successful authentication, redirect home.
+        res.redirect('/secrets');
+      });
+
+
 
 
 app.get("/secrets", function(req, res) {
